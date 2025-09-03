@@ -11,7 +11,7 @@ struct PACIENTE {
     PACIENTE *next;
 };
 
-PACIENTE* creaPaciente(char *name, int age, int room) {
+PACIENTE* creaPaciente(char *nombre, int edad, int peso, float altura) {
     PACIENTE *newPaciente = (PACIENTE*)malloc(sizeof(PACIENTE));
     newPaciente->nombre = nombre;
     newPaciente->edad = edad;
@@ -37,7 +37,7 @@ void printPacientes(PACIENTE *head) {
     cout << "Lista de pacientes: " << endl;
     PACIENTE *current = head;
     while(current != NULL) {
-        cout << "Nombre: " << current->name << ". Edad: " << current->age << ". Habitación: " << current->room << ".\n";
+        cout << "Nombre: " << current->nombre << ". Edad: " << current->edad << ". Peso: " << current->peso << ". Altura: " << current->altura << ".\n";
         current = current->next;
     }
 }
@@ -53,7 +53,7 @@ void freePacientes(PACIENTE *head) {
 
 int main() {
 
-    PACIENTE* creaPaciente(char *name, int age, int room);
+    PACIENTE* creaPaciente(char *name, int edad, int peso, float altura);
 
     PACIENTE *head = NULL;
     PACIENTE *newPaciente;
@@ -68,7 +68,6 @@ int main() {
     printPacientes(head);
 
     freePacientes(head);
-
-
+    
     return 0;
 }
