@@ -1,5 +1,5 @@
 #include <iostream>
-#include <cstring>
+#include <string>
 using namespace std;
 
 //Estructura Paciente
@@ -53,7 +53,7 @@ void freePacientes(PACIENTE *head) {
 
 int main() {
 
-    PACIENTE* creaPaciente(char *name, int edad, int peso, float altura);
+    PACIENTE* creaPaciente(string name, int edad, int peso, float altura);
 
     PACIENTE *head = NULL;
     PACIENTE *newPaciente;
