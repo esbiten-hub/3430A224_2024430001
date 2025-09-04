@@ -9,6 +9,7 @@ struct PACIENTE {
     float altura;
 };
 
+//Crea paciente con los atributos entregados
 PACIENTE creaPaciente(string nombre, int edad, int peso, float altura) {
     PACIENTE newPaciente;
     newPaciente.nombre = nombre;
