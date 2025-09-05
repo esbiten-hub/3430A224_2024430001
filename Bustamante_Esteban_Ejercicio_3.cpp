@@ -41,8 +41,8 @@ void insertarInicio(Nodo*& head, const PACIENTE& p) {
         head = n;
         return;
     }
-    n->next = head; //Enlaza el "head" al next del nuevo nodo
-    head = n; //Ahora head es el nuevo nodo
+    n->next = head; //Enlaza el "head" al next del nodo recien creado
+    head = n; //Ahora head pasa a ser el nodo recien creado
 }
 
 void mostrar(const Nodo* head) {
@@ -129,6 +129,7 @@ void calculoIMC(const Nodo* head) {
 int main() {
     Nodo* lista = nullptr;
     //Inserciones de ejemplo
+    insertarInicio(lista, {"Tomas", 20, 67, 1.75});
     insertarFinal(lista, {"Esteban", 19, 73, 1.78});
     insertarFinal(lista, {"Benjamin", 19, 70, 1.80});
     insertarFinal(lista, {"Hector", 21, 100, 1.70});
