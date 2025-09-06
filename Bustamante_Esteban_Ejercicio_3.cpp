@@ -119,9 +119,10 @@ void calculoPromedios(const Nodo* head) {
 
 void calculoIMC(const Nodo* head) {
     const Nodo* cur = head;
-    while(cur) {
+    while(cur) { //Recorre la lista
         float pacienteIMC = 0;
-        pacienteIMC = (cur->data.peso/(cur->data.altura * cur->data.altura));
+
+        pacienteIMC = (cur->data.peso/(cur->data.altura * cur->data.altura)); //Calcula peso/altura²
         cout << "IMC de paciente " << cur->data.nombre << " es " << pacienteIMC << ".\n"; 
         cur = cur->next;
     }
