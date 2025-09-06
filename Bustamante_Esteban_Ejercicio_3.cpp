@@ -101,13 +101,14 @@ void calculoPromedios(const Nodo* head) {
     float promedio_edad = 0;
     float promedio_peso = 0;
 
-    while(cur) {
+    while(cur) { //Recorre la lista sumando edades y pesos
         suma_edad += cur->data.edad;
         suma_peso += cur->data.peso;
-        total_pacientes++;
+        total_pacientes++; //Cuenta la cantidad de pacientes
         cur = cur->next;
     }
     if(total_pacientes > 0) {
+        //Calcula los promedios
         promedio_edad = suma_edad/total_pacientes;
         promedio_peso = suma_peso/total_pacientes;
 
