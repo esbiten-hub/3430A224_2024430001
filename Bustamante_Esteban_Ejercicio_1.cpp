@@ -24,8 +24,10 @@ struct PILA {
     }
 
     void push(int dato) {
-        pila_llena();
-        if(!band) {
+
+        pila_llena(); //Actualiza valor de la bandera
+
+        if(!band) { //Si no esta llena la pila, agrega.
             arreglo[tope] = dato;
             tope++;
         } else {
@@ -34,8 +36,10 @@ struct PILA {
     }
 
     void pop() {
-        pila_vacia();
-        if(!band) {
+
+        pila_vacia(); //Actualiza valor de la bandera
+
+        if(!band) { //Si no esta vacia la pila, elimina.
             arreglo[tope - 1] = 0;
             tope--;
         } else {
@@ -44,8 +48,15 @@ struct PILA {
     }
 
     void mostrar() {
-        for(int i = 1; i <= tope; i++) {
-            cout << "|" << arreglo[tope - i] << "|\n";
+
+        pila_vacia(); //Actualiza valor de la bandera
+
+        if(!band) { //Si la pila no esta vacia, la muestra.
+            for(int i = 1; i <= tope; i++) {
+                cout << "|" << arreglo[tope - i] << "|\n";
+            }
+        } else {
+            cout << "Pila vacia\n";
         }
     }
 };
