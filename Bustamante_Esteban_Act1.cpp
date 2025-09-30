@@ -58,7 +58,7 @@ void Insertar_Cola(Cola*& cola) {
         cola->final->Siguiente = nuevo;
         cola->final = nuevo;
     }
-    cout << "Estudiante """ << nuevo->Nombre << "ingresado.\n";
+    cout << "Estudiante " << nuevo->Nombre << "ingresado.\n";
 }
 
 void Eliminar_Cola(Cola*& cola) {
