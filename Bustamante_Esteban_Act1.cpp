@@ -14,7 +14,7 @@ struct Cola {
     bool BAND;
 
     bool Cola_Vacia() {
-        if(frente == nullptr) {
+        if(frente == nullptr) { //si no hay primer elemento -> true
             BAND = true;
         } else {
             BAND = false;
@@ -32,12 +32,13 @@ void Insertar_Cola(Cola*& cola) {
     string nombre, carrera;
     float promedio;
 
-    cola->Cola_Llena();
+    cola->Cola_Llena(); //verifica si la cola esta llena
     if(cola->BAND == true) {
         cout << "La cola esta llena.\n";
         return;
     }
 
+    //Crea nodo
     Nodo* nuevo = new Nodo();
     cout << "Ingrese el nombre del estudiante: ";
     cin >> nombre;
@@ -51,11 +52,11 @@ void Insertar_Cola(Cola*& cola) {
     nuevo->Siguiente = nullptr;
 
     cola->Cola_Vacia();
-    if(cola->BAND == true) {
+    if(cola->BAND == true) { //en caso de ser el primer elemento ingresado
         cola->frente = nuevo;
         cola->final = nuevo;
     } else {
-        cola->final->Siguiente = nuevo;
+        cola->final->Siguiente = nuevo; //enlaza al final
         cola->final = nuevo;
     }
     cout << "Estudiante " << nuevo->Nombre << "ingresado.\n";
@@ -68,6 +69,7 @@ void Eliminar_Cola(Cola*& cola) {
         return;
     }
 
+    //Elimina el primero de la cola
     Nodo* aux = cola->frente;
     cola->frente = aux->Siguiente;
     cout << "Estudiante " << aux->Nombre << " eliminado.\n";
@@ -81,6 +83,7 @@ void Mostrar_Cola(Cola* cola) {
         return;
     }
 
+    //Recorre la cola con el nodo aux hasta que llegue al final
     Nodo* aux = cola->frente;
     while(aux != nullptr) {
         cout << aux->Nombre << " | " << aux->Carrera << " | Promedio: " << aux->Promedio << endl;
@@ -89,7 +92,7 @@ void Mostrar_Cola(Cola* cola) {
 }
 
 int main() {
-    //Inicializa la Cola
+    //Inicializa la Cola 
     Cola* cola = new Cola();
     cola->frente = nullptr;
     cola->final = nullptr;
