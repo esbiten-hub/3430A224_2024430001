@@ -190,6 +190,7 @@ void Exportar_Cola(Cola* cola) {
     int resultado;
     resultado = system(comando.c_str());
     if (resultado == 0) {
+        delete cola; //Libera el espacio de memoria antes de que cierre el programa
         cout << "+ Imagen graphviz generada: " << outputPng << "\n";
     } else {
         cout << "+ [ERROR]: Revise que esté instalado el software graphviz. Revise el comando de generacion de imagen. Revise el archivo input para la generacion de imagen.\n";
@@ -238,6 +239,7 @@ void menu(Cola*& cola) {
                 Exportar_Cola(cola);
                 break;
             case 6:
+                delete cola; //Libera espacio de memoria
                 cout << "Saliendo del programa...\n";
                 return;
             default:

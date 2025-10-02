@@ -120,6 +120,7 @@ int main() {
                 Mostrar_Cola(cola); //Mostrar cola
                 break;
             case 4:
+            delete cola;
                 cout << "Saliendo del programa...\n";
                 break;
             default:
