@@ -29,23 +29,24 @@ struct Cola {
 
 void Lee_pdb(Cola*& cola, string resn, int resid) {
 
-    cola->Cola_Llena();
+    cola->Cola_Llena(); //lita dinamica no se llena
     if(cola->BAND == true) {
         cout << "La cola esta llena.\n";
         return;
     }
 
+    //Crea nodo; recibe los valores del pdb
     Nodo* nuevo = new Nodo();
     nuevo->resn = resn;
     nuevo->resid = resid;
     nuevo->Siguiente = nullptr;
 
     cola->Cola_Vacia();
-    if(cola->BAND == true) {
+    if(cola->BAND == true) { //en caso de ser el primer elemento
         cola->frente = nuevo;
         cola->final = nuevo;
     } else {
-        cola->final->Siguiente = nuevo;
+        cola->final->Siguiente = nuevo; //enlaza al final
         cola->final = nuevo;
     }
     cout << "Residuo " << nuevo->resn << " ingresado.\n";
@@ -59,6 +60,7 @@ void Insertar_Cola(Cola*& cola, string resn) {
         return;
     }
     
+    //Crea nodo; recibe valores del input
     Nodo* nuevo = new Nodo();
     nuevo->resn = resn;
     nuevo->resid = cola->final->resid + 1;
@@ -78,9 +80,10 @@ void Modificar_Cola(Cola*& cola, string resn, int resid) {
         return;
     }
 
+    //crea nodo aux para recorrer la cola
     Nodo* aux = cola->frente;
     while(aux != nullptr) {
-        if(aux->resid == resid) {
+        if(aux->resid == resid) { //encuentra el residuo y lo modifica
             aux->resn = resn;
             cout << "Residuo modificado.\n";
             return;
@@ -98,14 +101,15 @@ void Eliminar_Residuo(Cola*& cola, int resid) {
         return;
     }
 
+    //crea nodo aux para recorrer la cola
     Nodo* aux = cola->frente;
     Nodo* anterior = nullptr;
     while(aux != nullptr) {
-        if(aux->resid == resid) {
-            if(aux == cola->frente) {
+        if(aux->resid == resid) { //encuentra el residuo
+            if(aux == cola->frente) { //elimina el primero
                 cola->frente = aux->Siguiente;
             } else {
-                anterior->Siguiente = aux->Siguiente;
+                anterior->Siguiente = aux->Siguiente; //enlaza el nodo anterior y el siguiente del nodo a eliminar
 
             }
             delete aux;
@@ -125,6 +129,7 @@ void Mostrar_Cola(Cola* cola) {
         return;
     }
 
+    //Crea nodo aux para recorrer la cola e imprime los atributos
     Nodo* aux = cola->frente;
     while(aux != nullptr) {
         cout << aux->resn << " | " << aux->resid << "\n";
@@ -247,13 +252,15 @@ int main() {
     cola->frente = nullptr;
     cola->final = nullptr;
 
+    //Reconoce el pdb
     ifstream archivo("3W9R_Resids_ChainA_Format_Uniq.pdb");
-    if(!archivo.is_open()) {
+    if(!archivo.is_open()) { //Verifica poder abrirlo
         cout << "Error al abrir el archivo.\n";
         return 0;
     }
 
     string linea;
+    //Lee el pdb agregando por cada linea un residuo a la cola
     while(getline(archivo, linea)) {
         string resn = linea.substr(0, 3);
         int resid = stoi(linea.substr(4, 7));
