@@ -171,19 +171,19 @@ void modificarNumero(Node*& nodo, int num) {
 void escribirRecorrido(Node* nodo, ofstream& fp) {
     if(nodo != nullptr) {
         if(nodo->left != nullptr) {
-            fp << to_string(nodo->info) << "->" << to_string(nodo->left->info) << ";\n";
+            fp << "\"" << to_string(nodo->info) << "\" -> \"" << to_string(nodo->left->info) << "\";\n";
         } else {
             string cadena = to_string(nodo->info) + "i";
-            fp << cadena + "[shape=point];\n";
-            fp << to_string(nodo->info) << "->" << cadena << ";\n";
+            fp <<  "\"" << cadena << "\" [shape=point];\n";
+            fp << "\"" << to_string(nodo->info) << "\" -> \"" << cadena << "\";\n";
         }
 
         if(nodo->right != nullptr) {
-            fp << to_string(nodo->info) << "->" << to_string(nodo->right->info) << ";\n";
+            fp << "\"" << to_string(nodo->info) << "\" -> \"" << to_string(nodo->right->info) << "\";\n";
         } else {
             string cadena = to_string(nodo->info) + "d";
-            fp << cadena << "[shape=point];\n";
-            fp << to_string(nodo->info) << "->" << cadena << ";\n";
+            fp << "\"" << cadena << "\" [shape=point];\n";
+            fp << "\"" << to_string(nodo->info) << "\" -> \"" << cadena << "\";\n";
         }
 
         escribirRecorrido(nodo->left, fp);
