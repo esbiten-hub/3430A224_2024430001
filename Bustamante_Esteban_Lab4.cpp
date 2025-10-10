@@ -80,11 +80,11 @@ void recorrerArbol(Node*& nodo) {
     printInorden(nodo);
     cout << "\nRecorrido en postorden: ";
     printPosorden(nodo);
+    cout << "\n";
     return;
 }
 
 void insertarNumero(Node*& nodo, int num) {
-    
     if(num < nodo->info) {
         if(nodo->left == nullptr) {
             nodo->left = createNode(num);
@@ -146,13 +146,71 @@ void eliminarNumero(Node*& nodo, int num) {
     }
 }
 
-
 void modificarNumero(Node*& nodo, int num) {
-    return;
+    if(num < nodo->info) {
+        if(nodo->left == nullptr) {
+            cout << "La información no se encuentra en el árbol.\n";
+        } else {
+            modificarNumero(nodo->left, num);
+        }
+    } else {
+        if(num > nodo->info) {
+            if(nodo->right == nullptr) {
+                cout << "La información no se encuentra en el árbol.\n";
+            } else {
+                modificarNumero(nodo->right, num);
+            }
+        } else {
+            cout << "La información está en el árbol.\n";
+            cout << "Ingrese la nueva información: ";
+            cin >> nodo->info;
+        }
+    }
 }
 
-void generarGrafo() {
-    return;
+void escribirRecorrido(Node* nodo, ofstream& fp) {
+    if(nodo != nullptr) {
+        if(nodo->left != nullptr) {
+            fp << to_string(nodo->info) << "->" << to_string(nodo->left->info) << ";\n";
+        } else {
+            string cadena = to_string(nodo->info) + "i";
+            fp << cadena + "[shape=point];\n";
+            fp << to_string(nodo->info) << "->" << cadena << ";\n";
+        }
+
+        if(nodo->right != nullptr) {
+            fp << to_string(nodo->info) << "->" << to_string(nodo->right->info) << ";\n";
+        } else {
+            string cadena = to_string(nodo->info) + "d";
+            fp << cadena << "[shape=point];\n";
+            fp << to_string(nodo->info) << "->" << cadena << ";\n";
+        }
+
+        escribirRecorrido(nodo->left, fp);
+        escribirRecorrido(nodo->right, fp);
+    }
+}
+
+void generarGrafo(Node* nodo) {
+    ofstream fp("grafo.txt");
+
+    if (!fp.is_open()) {
+        cerr << "Error al abrir el archivo grafo.txt\n";
+        return;
+    }
+
+    fp << "digraph G {\n";
+    fp << "node [style=filled fillcolor=yellow];\n";
+
+    escribirRecorrido(nodo, fp);
+
+    fp << "}\n";
+
+    fp.close();
+
+    // Generar y mostrar la imagen del árbol
+    system("dot -Tpng -o grafo.png grafo.txt");
+    system("eog grafo.png");
 }
 
 
@@ -192,7 +250,7 @@ void menu(Node*& root) {
                 recorrerArbol(root);
                 break;
             case 5:
-                generarGrafo();
+                generarGrafo(root);
                 break;
             case 6:
                 cout << "Saliendo...\n";
