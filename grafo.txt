@@ -1,0 +1,13 @@
+digraph G {
+node [style=filled fillcolor=yellow];
+100->50;
+100->150;
+50i[shape=point];
+50->50i;
+50d[shape=point];
+50->50d;
+150i[shape=point];
+150->150i;
+150d[shape=point];
+150->150d;
+}
