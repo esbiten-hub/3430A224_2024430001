@@ -1,12 +1,15 @@
 #include <iostream>
 #include <fstream>
+#include <set>
 using namespace std;
 
+//Estructura de un nodo
 struct Node {
     int info;
     Node* left;
     Node* right;
 };
+
 
 Node* createNode(int data) {
     Node* newNode = new Node;
@@ -16,22 +19,30 @@ Node* createNode(int data) {
     return newNode;
 }
 
-void crea_arbol(Node* &apnodo) {
+// Función para crear el árbol
+void crea_arbol(Node* &apnodo, set<int>& valores) {
     if(apnodo == nullptr) {
         int valor;
-        cout << "Ingrese valor para el nodo: ";
-        cin >> valor;
-        apnodo = createNode(valor);
+        do {
+            cout << "Ingrese valor para el nodo: ";
+            cin >> valor;
+            if(valores.count(valor)) { //Revisa si el valor ya existe en el "set"
+                cout << "El valor ya existe. Ingrese otro valor.\n";
+            }
+        } while (valores.count(valor));
+
+        apnodo = createNode(valor); // Crea el nodo
+        valores.insert(valor); // Agrega el valor al set
     }
 
     char resp;
 
     // Preguntar por hijo izquierdo
     cout << "¿Existe nodo por la izquierda de " << apnodo->info << "? (s/n): ";
-    std::cin >> resp;
+    cin >> resp;
     if(resp == 's' || resp == 'S') {
         apnodo->left = nullptr;
-        crea_arbol(apnodo->left); // llamada recursiva
+        crea_arbol(apnodo->left, valores); // llamada recursiva con nodo izquierdo
     } else {
         apnodo->left = nullptr;
     }
@@ -41,7 +52,7 @@ void crea_arbol(Node* &apnodo) {
     cin >> resp;
     if(resp == 's' || resp == 'S') {
         apnodo->right = nullptr;
-        crea_arbol(apnodo->right); // llamada recursiva
+        crea_arbol(apnodo->right, valores); // llamada recursiva con nodo derecho
     } else {
         apnodo->right = nullptr;
     }
@@ -73,6 +84,7 @@ void printPosorden(Node* nodo) {
     }
 }
 
+
 void recorrerArbol(Node*& nodo) {
     cout << "Recorrido en preorden: ";
     printPreorden(nodo);
@@ -86,12 +98,16 @@ void recorrerArbol(Node*& nodo) {
 
 void insertarNumero(Node*& nodo, int num) {
     if(num < nodo->info) {
+        // Si el numero es menor -> revisa nodo izquierdo
+        //si nodo izquierdo existe -> llamada recuriva, si no -> agrega
         if(nodo->left == nullptr) {
             nodo->left = createNode(num);
         } else {
             insertarNumero(nodo->left, num);
         }
     } else {
+        // Si el numero es mayor -> revisa nodo derecho
+        //si nodo derecho existe -> llamada recuriva, si no -> agrega
         if(num > nodo->info) {
             if(nodo->right == nullptr) {
                 nodo->right = createNode(num);
@@ -106,20 +122,27 @@ void insertarNumero(Node*& nodo, int num) {
 
 void eliminarNumero(Node*& nodo, int num) {
     if(nodo != nullptr) {
+        //Busca el nodo con el numero a eliminar
         if(num < nodo->info) {
             eliminarNumero(nodo->left, num);
         } else {
             if(num > nodo->info) {
                 eliminarNumero(nodo->right, num);
             } else {
+                //Guarda el nodo a eliminar en un nodo auxiliar
+                //para no perder la referencia antes de eliminarlo
                 Node* OTRO;
                 OTRO = nodo;
                 if(OTRO->right == nullptr) {
+                    //Si no tiene hijo derecho, el arbol se engancha con el hijo izquierdo
                     nodo = OTRO->left;
                 } else {
                     if(OTRO->left == nullptr) {
+                        //Si no tiene hijo izquierdo, el arbol se engancha con el hijo derecho
                         nodo = OTRO->right;
                     } else {
+                        //Si tiene ambos hijos, busca el nodo mas grande del subarbol izquierdo
+                        //para sustituir el nodo a eliminar
                         Node* aux;
                         Node* aux1;
                         aux = nodo->left;
@@ -129,14 +152,17 @@ void eliminarNumero(Node*& nodo, int num) {
                             aux = aux->right;
                             BO = true;
                         }
+                        //Reemplaza el nodo a eliminar con el nodo mas grande del subarbol izquierdo
                         nodo->info = aux->info;
                         OTRO = aux;
+                        //Sirve para reconectar el arbol
                         if(BO == true) {
                             aux1->right = aux->left;
                         } else {
                             nodo->left = aux->left;
                         }
                     }
+                    //Libera memoria
                     delete OTRO;
                 }
             }
@@ -147,6 +173,8 @@ void eliminarNumero(Node*& nodo, int num) {
 }
 
 void modificarNumero(Node*& nodo, int num) {
+    //Si el numero es menor -> revisa nodo izquierdo
+    //Si el numero es mayor -> revisa nodo derecho
     if(num < nodo->info) {
         if(nodo->left == nullptr) {
             cout << "La información no se encuentra en el árbol.\n";
@@ -160,6 +188,8 @@ void modificarNumero(Node*& nodo, int num) {
             } else {
                 modificarNumero(nodo->right, num);
             }
+        
+        //Si encuentra el numero a modificar, reemplaza con la nueva informacion
         } else {
             cout << "La información está en el árbol.\n";
             cout << "Ingrese la nueva información: ";
@@ -171,21 +201,27 @@ void modificarNumero(Node*& nodo, int num) {
 void escribirRecorrido(Node* nodo, ofstream& fp) {
     if(nodo != nullptr) {
         if(nodo->left != nullptr) {
+            //Escribe la conexion del nodo con su hijo izquierdo
             fp << "\"" << to_string(nodo->info) << "\" -> \"" << to_string(nodo->left->info) << "\";\n";
         } else {
+            //Crea un nodo auxiliar vacio para hacer referencia a proximos nodos
             string cadena = to_string(nodo->info) + "i";
             fp <<  "\"" << cadena << "\" [shape=point];\n";
             fp << "\"" << to_string(nodo->info) << "\" -> \"" << cadena << "\";\n";
         }
 
         if(nodo->right != nullptr) {
+            //Escribe la conexion del nodo con su hijo derecho
             fp << "\"" << to_string(nodo->info) << "\" -> \"" << to_string(nodo->right->info) << "\";\n";
         } else {
+            //Crea un nodo auxiliar vacio para hacer referencia a proximos nodos
             string cadena = to_string(nodo->info) + "d";
             fp << "\"" << cadena << "\" [shape=point];\n";
             fp << "\"" << to_string(nodo->info) << "\" -> \"" << cadena << "\";\n";
         }
 
+        //Llamada recursiva para los nodos hijos
+        //Es un recorrido en preorden
         escribirRecorrido(nodo->left, fp);
         escribirRecorrido(nodo->right, fp);
     }
@@ -199,9 +235,11 @@ void generarGrafo(Node* nodo) {
         return;
     }
 
+    // Encabezado
     fp << "digraph G {\n";
     fp << "node [style=filled fillcolor=yellow];\n";
 
+    // Cuerpo del grafo
     escribirRecorrido(nodo, fp);
 
     fp << "}\n";
@@ -262,11 +300,13 @@ void menu(Node*& root) {
     } while(opcion != 6);
 }
 
+
 int main() {
     Node* root = nullptr;
+    set<int> valores; // Conjunto para verificar duplicados
 
     cout << "Para comenzar cree el árbol binario\n";
-    crea_arbol(root);
+    crea_arbol(root, valores);
 
     menu(root);
     return 0;
