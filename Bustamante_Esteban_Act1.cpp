@@ -3,6 +3,7 @@
 #include <sstream>
 using namespace std;
 
+//Estructura nodo
 struct NODO{
     NODO* left;
     NODO* right;
@@ -13,36 +14,47 @@ struct NODO{
 };
 
 void insercionBalanceado(NODO** nodocabeza, bool* BO, string GO, double score, string function) {
-    NODO* raiz = *nodocabeza;
+    NODO* raiz = *nodocabeza; //Hace referenia al nodo actual
     NODO* nodo1;
     NODO* nodo2;
 
     if(raiz != nullptr) {
-        if(score< raiz->score) {
+        if(score < raiz->score) {
+            //Si score es menor, revisa subarbol izquierdo
             insercionBalanceado(&(raiz->left), BO, GO, score, function);
-            if(*BO) {
-                switch (raiz->FE) {
+            if(*BO) { //Si el árbol creció hacia la izquierda
+                switch (raiz->FE) { //Actuar según factor de equilibrio
                     case 1:
+                        //En el subarbol izquierdo, con inclinación hacia la derecha
+                        //al inrgresar un nodo por la izquierda, el factor de equilibrio se vuelve 0 (equilibrado)
                         raiz->FE = 0;
-                        *BO = false;
+                        *BO = false; //No aumenta nivel del arbol
                         break;
                     case 0:
+                        //En el subarbol izquierdo, equilibrado.
+                        //Agregar nodo por la izquierda implica una inclinación hacia la izquierda (FE = -1)
                         raiz->FE = -1;
                         break;
                     case -1:
+                        //En el subarbol izquierdo, con inclinación hacia la izquierda
+                        //al inrgresar un nodo por la izquierda, la inclinacion -1 se vuelve -2.
+                        //Se debe balancear el árbol -> Rotación II (Izquierda - Izquierda).
                         nodo1 = raiz->left;
-                        if(nodo1-> FE <= 0) { //Rotacion II
+                        if(nodo1-> FE <= 0) {
+                            //Si el hijo izquierdo tiene FE <= 0, rotación II
                             raiz->left = nodo1->right;
                             nodo1->right = raiz;
                             raiz ->FE = 0;
                             raiz = nodo1;
-                        } else { //Rotacion ID
+                        } else {
+                            //Rotacion ID (Izquierda - Derecha)
                             nodo2 = nodo1->right;
                             raiz->left = nodo2->right;
                             nodo2->right = raiz;
                             nodo1->right = nodo2->left;
                             nodo2->left = nodo1;
                             
+                            //Actualiza los factores de equilibrio
                             if(nodo2->FE == -1)
                                 raiz->FE = 1;
                             else
@@ -52,14 +64,20 @@ void insercionBalanceado(NODO** nodocabeza, bool* BO, string GO, double score, s
                                 nodo1->FE = -1;
                             else
                                 nodo1->FE = 0;
+
+                            //Por definicion de la rotacion ID
+                            //nodo 2 es el nuevo raiz
                             raiz = nodo2;
                         }
+
+                        //Tanto la rotación II como ID dejan el factor de equilibrio en 0
                         raiz->FE = 0;
                         *BO = false;
                         break;
                 }
             }
         } else if(score > raiz->score) {
+            //Si score es mayor, revisa subarbol derecho
             insercionBalanceado(&(raiz->right), BO, GO, score, function);
             if(*BO) {
                 switch (raiz->FE) {
@@ -104,6 +122,7 @@ void insercionBalanceado(NODO** nodocabeza, bool* BO, string GO, double score, s
             cout << "El elemento ya se encuentra en el árbol\n";
         }
     } else {
+        //Inserta nodo en una hoja vacía
         raiz = new NODO();
         raiz->GO = GO;
         raiz->score = score;
@@ -111,23 +130,32 @@ void insercionBalanceado(NODO** nodocabeza, bool* BO, string GO, double score, s
         raiz->left = nullptr;
         raiz->right = nullptr;
         raiz->FE = 0;
+
+        //Se realizó una inserción
         *BO = true;
     }
 
-    *nodocabeza = raiz;
+    *nodocabeza = raiz; //Actualiza la raíz del subárbol
 }
 
 void PreOrden(NODO* nodo, ofstream& fp) {
     if(nodo != nullptr) {
+        //Si tiene hijo en la izquierda lo escribe
         if(nodo->left != nullptr) {
+            //Escribe la conexion con su hijo iquierdo y el factor de equilibrio
             fp << "\"" << nodo->function << "\\n" << nodo->score << "\"" << " -> " << "\"" << nodo->left->function << "\\n" << nodo->left->score << "\"" << "[label=" << nodo->FE << "]" << ";\n";
         } else {
+            //Si no tiene hijo izquierdo
+            //Conecta a un hijo vacío de ejemplo
             fp << "\"" << nodo->function << "\\n" << nodo->score << "i\" [shape=point];\n";
             fp << "\"" << nodo->function << "\\n" << nodo->score << "\" -> \"" << nodo->function << "\\n" << nodo->score << "i\";\n";
         }
         if(nodo->right != nullptr) {
+            //Escribe la conexion con su hijo derecho y el factor de equilibrio
             fp << "\"" << nodo->function << "\\n" << nodo->score << "\"" << " -> " << "\"" << nodo->right->function << "\\n" << nodo->right->score << "\"" << "[label=" << nodo->FE << "]" << ";\n";
         } else {
+            //Si no tiene hijo derecho
+            //Conecta a un hijo vacío de ejemplo
             fp << "\"" << nodo->function << "\\n" << nodo->score << "d\" [shape=point];\n";
             fp << "\"" << nodo->function << "\\n" << nodo->score << "\" -> \"" << nodo->function << "\\n" << nodo->score << "d\";\n";
         }
@@ -138,23 +166,34 @@ void PreOrden(NODO* nodo, ofstream& fp) {
 
 void generarGrafo(NODO* raiz) {
     if(!raiz) return;
+    //Crea grafo.txt e inicia primeras lineas
     ofstream fp("grafo.txt");
     fp << "digraph G {\n";
-    fp << "node [style=filled fillcolor=gray shape=box];\n";
+    fp << "node [style=filled fillcolor=gray shape=box];\n"; //tipo de figuras nodos
+    //Escribe en grafo.txt recorrido en preorden
     PreOrden(raiz, fp);
     fp << "}\n";
     fp.close();
+
+    //Crea grafo.png
     system("dot -Tpng -ografo.png grafo.txt");
+    //Abre el grafo
     system("eog grafo.png &");
 }
 
 void Busqueda(NODO* nodo, double score) {
     if(nodo != nullptr) {
+
+        //si el score es menor, revisa por la izquierda
         if(score < nodo->score) {
             Busqueda(nodo->left, score);
         } else if(score > nodo->score) {
+
+            //si el score es mayor, revisa por la derecha
             Busqueda(nodo->right, score);
         } else {
+
+            //si el score es igual, lo encontró
             cout << "Encontrado...\n";
             cout << "///////////////\n";
             cout << "GO: " << nodo->GO << endl;
@@ -243,9 +282,7 @@ int main(int argc, char* argv[]) {
         getline(ss, GO, ',');
         getline(ss, function, ',');
         ss >> score;
-        cout << GO << " " << function << " " << score << endl;
-        //Crea el nodo
-        //Hasta aqui todo bien, salta encabezado y lee primer GO object
+        //Envia los valores al árbol para insertar
         insercionBalanceado(&raiz, &inicio, GO, score, function);
     }
     
