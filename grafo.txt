@@ -1,0 +1,9 @@
+digraph G {
+graph [rankdir=LR]
+node [style=filled fillcolor=yellow];
+a->b [label=2];
+a->c [label=5];
+b->a [label=5];
+c->a [label=2];
+c->b [label=5];
+}
