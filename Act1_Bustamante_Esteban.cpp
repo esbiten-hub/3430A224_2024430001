@@ -218,6 +218,13 @@ void actualizar_pesos(int D[], char VS[], int **M, char V[], char v, int N) {
     }
 }
 
+void libera_memoria(int **M, int N) {
+    for(int i = 0; i < N; i++) {
+        delete[] M[i];
+    }
+    delete[] M;
+}
+
 //implementacion de algoritmo dijkstra
 void aplicar_dijkstra(char V[], char S[], char VS[], int D[], int **M, int N) {
     int i;
@@ -291,6 +298,8 @@ void imprimir_grafo(int **M, char vector[], int N) {
 
     system("dot -Tpng -ografo.png grafo.txt");
     system("eog grafo.png &");
+
+    libera_memoria(M, N);
 }
 
 int main(int argc, char **argv) {
