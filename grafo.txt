@@ -1,9 +1,15 @@
 digraph G {
 graph [rankdir=LR]
 node [style=filled fillcolor=yellow];
-a->b [label=2];
-a->c [label=5];
-b->a [label=5];
-c->a [label=2];
-c->b [label=5];
+a->b [label=3];
+a->c [label=4];
+a->d [label=1];
+b->a [label=3];
+b->c [label=1];
+c->a [label=6];
+c->b [label=2];
+c->d [label=5];
+d->a [label=3];
+d->b [label=1];
+d->c [label=7];
 }
