@@ -154,7 +154,7 @@ int elegir_vertice(char VS[], int D[], char V[], int N) {
     while(VS[i] != ' ') { //recorrer solo los válidos
         peso = D[buscar_indice_caracter(V, VS[i], N)];
         //descarta valores infinitos (-1) y 0
-        if((peso != 1) && (peso != 0)) {
+        if((peso != -1) || (peso != 0)) {
             if(i == 0) {
                 menor = peso;
                 vertice = VS[i];
@@ -173,32 +173,31 @@ int elegir_vertice(char VS[], int D[], char V[], int N) {
 
 //retorna el minimo entre el valor actual y uno posible nuevo
 int calcular_minimo(int dw, int dv, int mvw) {
-    int min = 0;
+  int min = 0;
 
-    // si w e infinito
-    if(dw == -1) {
-        //si existe camino hasta v y de v a w
-        if(dv != -1 && mvw != -1) {
-            min = dv + mvw;
-        } else {
-            min = -1;
-        }
+  // si w es infinito
+  if (dw == -1) {
+    //si existe camino hasta v y de v a w
+    if (dv != -1 && mvw != -1)
+      min = dv + mvw;
+    else
+      min = -1;
 
-    } else {
-        //comparacion con nueva posible ruta
-        if(dv != -1 && mvw != -1) {
-            if(dw <= (dv + mvw)) {
-                min = dw;
-            } else {
-                min = (dv + mvw);
-            }
-        } else {
-            min = dw;
-        }
+  } else {
+    //comparacion con nueva posible ruta
+    if (dv != -1 && mvw != -1) {
+      if (dw <= (dv + mvw))
+        min = dw;
+      else
+        min = (dv + mvw);
     }
-
-    printf("dw; %d dv: %d mvw: %d min: %d\n", dw, dv, mvw, min);
-    return min;
+    else
+      min = dw;
+  }
+  
+  printf("dw: %d dv: %d mvw: %d min: %d\n", dw, dv, mvw, min);
+  cout << "/////" << dw << " " << "pasa a ser " << min << "/////\n"; 
+  return min;
 }
 
 //actualiza pesos en D tras elegir un nuevo vertice
