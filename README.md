@@ -147,11 +147,16 @@ Fragmento del resultado:
 
   ```bash
     ------------ Estados iniciales ------------
-    matriz[0,0]: 0 matriz[0,1]: 4 ...
-    S[0]: a VS: b c d e
-    D: 4 -1 3 6
-    vertice elegido: c
-    Actualizando pesos en D[]
+    matriz[0,0]: 0 matriz[0,1]: 3 matriz[0,2]: 4 matriz[0,3]: 1 
+    matriz[1,0]: 3 matriz[1,1]: 0 matriz[1,2]: 1 matriz[1,3]: -1 
+    matriz[2,0]: 6 matriz[2,1]: 2 matriz[2,2]: 0 matriz[2,3]: 5 
+    matriz[3,0]: 3 matriz[3,1]: 1 matriz[3,2]: 7 matriz[3,3]: 0 
+
+    S[0]:   S[1]:   S[2]:   S[3]:   
+    VS[0]:   VS[1]:   VS[2]:   VS[3]:   
+    D[0]: 0 D[1]: 3 D[2]: 4 D[3]: 1
+
+    vertice elegido: d
     ...
 ```
 
@@ -159,13 +164,23 @@ Fragmento del resultado:
 
 ## 🧪 Resultado esperado
 
-Resultado de ejemplo de una ejecución donde el valor **N** ingresado fué 3, es decir, se escogió la ruta más corta entre 3 vértices conectados entre sí de forma aleaotria.
+Resultado de ejemplo de una ejecución donde el valor **N** ingresado fué 4, es decir, se escogió la ruta más corta entre 4 vértices conectados entre sí de forma aleaotria.
 
 ```bash
-    Actualizando pesos en D[]
-    D[0]: 0 D[1]: 6 D[2]: -1 
-```
+    Elige el vértice menor en VS[] según valores en D[]
+    Lo agrega a S[] y actualiza VS[]
 
+    vertice elegido: c
+    S[0]: a S[1]: d S[2]: b S[3]: c 
+    VS[0]:   VS[1]:   VS[2]:   VS[3]:   
+
+    Actualizando pesos en D[]
+    D[0]: 0 D[1]: 2 D[2]: 3 D[3]: 1 
+
+```
+- Finalmente, en la última iteración, se escoge el vértice **c**. Es añadido a **S[]** (el recorrido) -> a, d, b, c.
+- En **VS[]** vacío se comprueba que todos los vértices fueron añadidos al recorrido en **S[]**.
+- Los pesos actualizados en **D[]** se evalúan en cada iteración.
 ---
 
 ## 👨‍💻 Autoría
