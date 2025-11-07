@@ -49,8 +49,98 @@ void leer_nodos(char vector[], int N) {
     }
 }
 
-void aplicar_prim(char V[], char S[], char VS[], int D[], int **M, int N) {
-    //
+//imprime contenido de la matriz (filas y columnas) de enteros
+void imprimir_matriz(int **M, int N) {
+    int columna, fila;
+
+    for(fila = 0; fila < N; fila ++) {
+        for(columna = 0; columna < N; columna ++) {
+            printf("matriz[%d,%d]: %d ", fila, columna, M[fila][columna]);
+        }
+        printf("\n");
+    }
+}
+
+void imprimir_grafo(int **M, char V[], int N) {
+    FILE *fp;
+    fp = fopen("grafo.dot", "w");
+    fprintf(fp, "graph G {\n");
+
+    for(int i = 0; i < N; i++) {
+        fprintf(fp, "  %c;\n", V[i]); //Declarar cada nodo
+    }
+    for(int i = 0; i < N; i++) {
+        for(int j = i + 1; j < N; j++) {
+            if(M[i][j] > 0) {
+                fprintf(fp, "  %c -- %c [label=%d];\n", V[i], V[j], M[i][j]);
+            }
+        }
+    }
+    fprintf(fp, "}\n");
+    fclose(fp);
+
+    system("dot -Tpng grafo.dot -o grafo.png");
+    system("eog grafo.png &");
+}
+
+void aplicar_prim(char V[], char U[], char VU[], char L[], int **M, int N) {
+    int cantidadU = 0;
+    int cantidadVU = N;
+    int mejorU, mejorV;
+    
+    //Agregamos V[0] a U (primer nodo)
+    U[cantidadU] = V[0];
+    cantidadU++;
+    //Remover V[0] de VU
+    for(int i = 0; i < cantidadVU - 1; i++) {
+        VU[i] = VU[i + 1];
+    }
+    cantidadVU--;
+
+    while(cantidadU != N) {
+        int minPeso = 999;
+        //Buscar el par (u,v) con 'u' en U y 'v' en VU
+        for(int i = 0; i < cantidadU; i++) {
+            for(int j = 0; j < cantidadVU; j++) {
+                //Mejor peso
+                int peso = M[U[i] - 'a'][VU[j] - 'a'];
+                cout << "////////////////////\n";
+                cout << "El peso entre " << U[i] << " y " << VU[j] << " es " << peso << endl;
+                if(peso > 0 && peso < minPeso) {
+                    minPeso = peso;
+                    mejorU = i;
+                    mejorV = j;
+                } else {
+                    cout << "No hay conexion\n";
+                }
+            }
+        }
+        //Agregar el mejor nodo encontrado
+        U[cantidadU] = VU[mejorV];
+        cantidadU++;
+        cout << "Se agrega " << U[cantidadU - 1] << endl;
+        //Registrar la arista en L
+        L[cantidadU - 2] = U[mejorU];
+        L[cantidadU - 1] = VU[mejorV];
+        cout << "Se creo L -> " << L[cantidadU - 2] << " - " << L[cantidadU - 1] << endl;
+        cout << "////////////////////\n";
+        //Remover el nodo de VU
+        for(int k = mejorV; k < cantidadVU - 1; k++) {
+            VU[k] = VU[k + 1];
+        }
+        cantidadVU--;
+    }
+    //Escribir L
+    for(int i = 0; i < N - 1; i++) {
+        cout << "(" << L[i] << ", " << L[i + 1] << ")" << endl;
+    }
+
+
+
+
+
+
+
 }
 
 int main(int argc, char **argv) {
@@ -66,8 +156,7 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    char V[N], S[N], VS[N];
-    int D[N];
+    char V[N], U[N], VU[N], L[N];
 
     //Valores de la matriz
     int **M;
@@ -76,17 +165,21 @@ int main(int argc, char **argv) {
         M[i] = new int[N];
     }
     inicializar_matriz_enteros(M, N);
-    
-    //Inicializar V, D Y VS
+    imprimir_matriz(M, N);
+
+    //Inicializar V, U, VU y L
     inicializar_vector_caracter(V, N);
-    inicializar_vector_caracter(S, N);
-    inicializar_vector_caracter(VS, N);
+    inicializar_vector_caracter(U, N);
+    inicializar_vector_caracter(VU, N);
+    inicializar_vector_caracter(L, N);
 
     //
     leer_nodos(V, N);
+    leer_nodos(VU, N);
 
+    imprimir_grafo(M, V, N);
     //Aplicar Prim
-    aplicar_prim(V, S, VS, D, M, N);
+    aplicar_prim(V, U, VU, L, M, N);
 
 
 
