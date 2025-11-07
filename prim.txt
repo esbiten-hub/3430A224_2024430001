@@ -1,0 +1,8 @@
+graph G {
+ layout=dot;
+  a;
+  b;
+  c;
+  a -- c [label=6];
+  a -- b [label=7];
+}
