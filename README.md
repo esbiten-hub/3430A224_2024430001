@@ -139,16 +139,16 @@ Fragmento del resultado:
     matriz[2,0]: 6 matriz[2,1]: 7 matriz[2,2]: 0 
 
     El peso entre a y b es 7
-    El peso entre a y c es 7
-    ///////////////
-    Se agrega b
-    Se crea L -> a - b
-    El peso entre a y c es 7
-    El peso entre b y c es 7
+    El peso entre a y c es 6
     ///////////////
     Se agrega c
     Se crea L -> a - c
-    (a, b)(a, c)
+    El peso entre a y b es 7
+    El peso entre c y b es 7
+    ///////////////
+    Se agrega b
+    Se crea L -> a - b
+    (a, c)(a, b)
 ```
 
 ---
