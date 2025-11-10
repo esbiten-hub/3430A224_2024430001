@@ -15,11 +15,6 @@ void burbuja(int arreglo[], int N) {
             }
         }
     }
-    //print arreglo
-    for(int i = 0; i < N; i++) {
-        cout << "a[" << i << "]" << arreglo[i] << " ";
-    }
-    cout << endl;
 }
 
 void insercion(int arreglo[], int N) {
@@ -32,11 +27,6 @@ void insercion(int arreglo[], int N) {
         }
         arreglo[j + 1] = aux;
     }
-    //print arreglo
-    for(int i = 0; i < N; i++) {
-        cout << "a[" << i << "]" << arreglo[i] << " ";
-    }
-    cout << endl;
 }
 
 void seleccion(int arreglo[], int N) {
@@ -53,16 +43,40 @@ void seleccion(int arreglo[], int N) {
         arreglo[i] = arreglo[k];
         arreglo[k] = aux;
     }
-    //print arreglo
+}
+
+void copiarArreglo(int arreglo[], int aux[], int N) {
+    for(int i = 0; i < N; i++) {
+        aux[i] = arreglo[i];
+    }
+}
+
+void printArreglo(int arreglo[], int N) {
     for(int i = 0; i < N; i++) {
         cout << "a[" << i << "]" << arreglo[i] << " ";
     }
     cout << endl;
 }
 
-void copiarArreglo(int arreglo[], int aux[], int N) {
-    for(int i = 0; i < N; i++) {
-        aux[i] = arreglo[i];
+void shellsort(int arreglo[], int N) {
+    int INT = N + 1; //tamaño de salto inicial
+    bool BAND; //bandera de intercambio
+    while(INT > 1) {
+        INT /= 2; //reducir el intervalo
+        BAND = true;
+        while(BAND) {
+            BAND = false;
+            int i = 0;
+            while((i + INT) < N) {
+                if(arreglo[i] > arreglo[i + INT]) {
+                    int aux = arreglo[i];
+                    arreglo[i] = arreglo[i + INT];
+                    arreglo[i + INT] = aux;
+                    BAND = true;
+                }
+                i++;
+            }
+        }
     }
 }
 
@@ -75,6 +89,7 @@ void ordenamiento_interno(int arreglo[], int N) {
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start).count();
     cout << "Burbuja       | " << duration << " milisegundos\n";
+    printArreglo(aux, N);
 
     //Insercion
     copiarArreglo(arreglo, aux, N);
@@ -83,6 +98,7 @@ void ordenamiento_interno(int arreglo[], int N) {
     stop = high_resolution_clock::now();
     duration = duration_cast<milliseconds>(stop - start).count();
     cout << "Insercion     | " << duration << " milisegundos\n";
+    printArreglo(aux, N);
 
     //Selección
     copiarArreglo(arreglo, aux, N);
@@ -91,6 +107,16 @@ void ordenamiento_interno(int arreglo[], int N) {
     stop = high_resolution_clock::now();
     duration = duration_cast<milliseconds>(stop - start).count();
     cout << "Seleccion     | " << duration << " milisegundos\n";
+    printArreglo(aux, N);
+
+    //Shellsort
+    copiarArreglo(arreglo, aux, N);
+    start = high_resolution_clock::now();
+    shellsort(aux, N);
+    stop = high_resolution_clock::now();
+    duration = duration_cast<milliseconds>(stop - start).count();
+    cout << "Shellsort     | " << duration << " milisegundos\n";
+    printArreglo(aux, N);
 }
 
 int main(int argc, char *argv[]) {
