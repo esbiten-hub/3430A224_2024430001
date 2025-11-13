@@ -80,43 +80,132 @@ void shellsort(int arreglo[], int N) {
     }
 }
 
-void ordenamiento_interno(int arreglo[], int N) {
+void reduce(int arreglo[], int INI, int FIN, int &POS) {
+    int IZQ = INI;
+    int DER = FIN;
+    int AUX;
+    bool BAND = true;
+    POS = INI;
+
+    while(BAND) {
+        //Mover DER hacia la izquierda mientras A[POS] <= A[DER]
+        while((arreglo[POS] <= arreglo[DER]) && (POS != DER)) {
+            DER--;
+        }
+        if(POS == DER) {
+            BAND = false;
+        } else {
+            AUX = arreglo[POS];
+            arreglo[POS] = arreglo[DER];
+            arreglo[DER] = AUX;
+            POS = DER;
+
+            //Mover IZQ hacia la derecha mientras A[POS] >= A[IZQ]
+            while((arreglo[POS] >= arreglo[IZQ]) && (POS != IZQ)) {
+                IZQ++;
+            }
+            if(POS == IZQ) {
+                BAND = false;
+            } else {
+                AUX = arreglo[POS];
+                arreglo[POS] = arreglo[IZQ];
+                arreglo[IZQ] = AUX;
+                POS = IZQ;
+            }
+        }
+    }
+}
+
+void quicksort(int arreglo[], int N) {
+    int INI, FIN, POS;
+    int TOPE = 0;
+    int PILAMENOR[N];
+    int PILAMAYOR[N];
+
+    TOPE = 1;
+    PILAMENOR[TOPE] = 0;
+    PILAMAYOR[TOPE] = N - 1;
+
+    while(TOPE > 0) {
+        INI = PILAMENOR[TOPE];
+        FIN = PILAMAYOR[TOPE];
+        TOPE--;
+        reduce(arreglo, INI, FIN, POS);
+
+        if(INI < (POS - 1)) {
+            TOPE++;
+            PILAMENOR[TOPE] = INI;
+            PILAMAYOR[TOPE] = POS - 1;
+        }
+
+        if(FIN > (POS + 1)) {
+            TOPE++;
+            PILAMENOR[TOPE] = POS + 1;
+            PILAMAYOR[TOPE] = FIN;
+        }
+    }
+}
+
+void ordenamiento_interno(int arreglo[], int N, char ver) {
     //Burbuja
-    int aux[N];
-    copiarArreglo(arreglo, aux, N);
+    int aux_burbuja[N];
+    copiarArreglo(arreglo, aux_burbuja, N);
     auto start = high_resolution_clock::now();
-    burbuja(aux, N);
+    burbuja(aux_burbuja, N);
     auto stop = high_resolution_clock::now();
     auto duration = duration_cast<milliseconds>(stop - start).count();
     cout << "Burbuja       | " << duration << " milisegundos\n";
-    printArreglo(aux, N);
 
     //Insercion
-    copiarArreglo(arreglo, aux, N);
+    int aux_insercion[N];
+    copiarArreglo(arreglo, aux_insercion, N);
     start = high_resolution_clock::now();
-    insercion(aux, N);
+    insercion(aux_insercion, N);
     stop = high_resolution_clock::now();
     duration = duration_cast<milliseconds>(stop - start).count();
     cout << "Insercion     | " << duration << " milisegundos\n";
-    printArreglo(aux, N);
 
     //Selección
-    copiarArreglo(arreglo, aux, N);
+    int aux_seleccion[N];
+    copiarArreglo(arreglo, aux_seleccion, N);
     start = high_resolution_clock::now();
-    seleccion(aux, N);
+    seleccion(aux_seleccion, N);
     stop = high_resolution_clock::now();
     duration = duration_cast<milliseconds>(stop - start).count();
     cout << "Seleccion     | " << duration << " milisegundos\n";
-    printArreglo(aux, N);
 
     //Shellsort
-    copiarArreglo(arreglo, aux, N);
+    int aux_shellsort[N];
+    copiarArreglo(arreglo, aux_shellsort, N);
     start = high_resolution_clock::now();
-    shellsort(aux, N);
+    shellsort(aux_shellsort, N);
     stop = high_resolution_clock::now();
     duration = duration_cast<milliseconds>(stop - start).count();
     cout << "Shellsort     | " << duration << " milisegundos\n";
-    printArreglo(aux, N);
+
+    //Quicksort
+    int aux_quicksort[N];
+    copiarArreglo(arreglo, aux_quicksort, N);
+    start = high_resolution_clock::now();
+    quicksort(aux_quicksort, N);
+    stop = high_resolution_clock::now();
+    duration = duration_cast<milliseconds>(stop - start).count();
+    cout << "Quicksort     | " << duration << " milisegundos\n";
+
+    //Escribe el arreglo si ver == 's'
+    if(ver == 's') {
+        cout << "------------------------------\n";
+        cout << "Burbuja         |";
+        printArreglo(aux_burbuja, N);
+        cout << "Insercion       |";
+        printArreglo(aux_insercion, N);
+        cout << "Seleccion       |";
+        printArreglo(aux_seleccion, N);
+        cout << "Shellsort       |";
+        printArreglo(aux_shellsort, N);
+        cout << "Quicksort       |";
+        printArreglo(aux_quicksort, N);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -137,7 +226,7 @@ int main(int argc, char *argv[]) {
     int arreglo[N];
     srand(time(nullptr));
     for(int i = 0; i < N; i++) {
-        arreglo[i] = rand() % 50;
+        arreglo[i] = rand() % 100;
     }
 
     //Imprime el arreglo si ver == 's'
@@ -152,6 +241,6 @@ int main(int argc, char *argv[]) {
     cout << "Método         | Tiempo\n";
     cout << "------------------------------\n";
 
-    ordenamiento_interno(arreglo, N);
+    ordenamiento_interno(arreglo, N, ver);
     return 0;
 }
