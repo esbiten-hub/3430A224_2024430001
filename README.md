@@ -1,4 +1,4 @@
-## Laboratorio 10: Automatización en conteo de residuos cargados en proteínas (PDB) y almacenamineto en .csv
+## Laboratorio 10: Automatización en conteo de residuos cargados en proteínas (PDB) y almacenamiento en .csv
 
 ## 📘 Descripción general
 Este script en **BASH** procesa tres archivos de estructura proteica en formato **PDB** y genera un archivo **CSV** con el conteo de átomos **CA** de cada residuo aminoacídico perteneciente a:
@@ -18,7 +18,7 @@ El resultado es una tabla **CSV** con el conteo de las veces que aparece cada re
 ## 🔢 Procesamiento del script
 El procesamiento se lleva a cabo por un ciclo **for** que reconoce cada archivo y residuo aminoacídico por medio de variables.
 Cada residuo de la lista:
-1. Se regstra su nombre en la primera columa del CSV.
+1. Se registra su nombre en la primera columna del CSV.
 2. Para cada proteína:
 - Se buscan las líneas que contengan **"CA"** y el nombre el residuo.
 - Se cuentan con **wc -l**.
