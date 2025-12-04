@@ -24,7 +24,7 @@ string leerFasta(string path) {
 
         //Elimina saltos de linea
         for(char c : linea) {
-            if(c == '\r' || c == '\n' || c == ' ') {continue;}
+            if(c == '\r' || c == '\n' || c == '\t' || c == ' ') {continue;}
             else {seqTemp += c;}
         }
         seq += seqTemp;
@@ -89,11 +89,11 @@ vector<vector<int>> algoritmo_Needleman_Wunsch(string S, string T, int U[4][4], 
     int m = T.size();
 
     //Creo la matriz f que tendrá las puntuaciones
-    vector<vector<int>> f(n + 1, vector<int>(m + 1, 0));
+    vector<vector<int>> f(m + 1, vector<int>(n + 1, 0));
 
     //Lee cada casilla de la matriz f y asigna la puntuacion
-    for(int i = 0; i <= n; i++) {
-        for(int j = 0; j <= m; j++) {
+    for(int i = 0; i <= m; i++) {
+        for(int j = 0; j <= n; j++) {
 
             //f[0][0] = 0
             if(i == 0 && j == 0) {
@@ -113,7 +113,7 @@ vector<vector<int>> algoritmo_Needleman_Wunsch(string S, string T, int U[4][4], 
             else {
                 int top = f[i - 1][j] + V;
                 int left = f[i][j - 1] + V;
-                int diag = f[i - 1][j - 1] + valor_de_similitud(S[i - 1], T[j - 1], U);
+                int diag = f[i - 1][j - 1] + valor_de_similitud(T[i - 1], S[j - 1], U);
 
                 //Escoge el valor más alto
                 int max = top;
@@ -163,8 +163,8 @@ void muestraAlineamiento(string S, string T, string pipes) {
 }
 
 void backtracking(string S, string T, vector<vector<int>> f, int V, int U[4][4]) {
-    int i = S.size();
-    int j = T.size();
+    int i = T.size();
+    int j = S.size();
 
     string alineamientoS = "";
     string alineamientoT = "";
@@ -172,9 +172,9 @@ void backtracking(string S, string T, vector<vector<int>> f, int V, int U[4][4])
     while(i > 0 || j > 0) {
 
         //Vino desde la diagonal (caso de match o missmatch)
-        if(i > 0 && j > 0 && f[i][j] == f[i - 1][j - 1] + valor_de_similitud(S[i - 1], T[j - 1], U)) {
-            alineamientoS = S[i - 1] + alineamientoS;
-            alineamientoT = T[j - 1] + alineamientoT;
+        if(i > 0 && j > 0 && f[i][j] == f[i - 1][j - 1] + valor_de_similitud(T[i - 1], S[j - 1], U)) {
+            alineamientoS = S[j - 1] + alineamientoS;
+            alineamientoT = T[i - 1] + alineamientoT;
             i--;
             j--;
             continue;
@@ -182,68 +182,30 @@ void backtracking(string S, string T, vector<vector<int>> f, int V, int U[4][4])
 
         //Vino desde arriba
         else if(i > 0 && j > 0 && f[i][j] == f[i - 1][j] + V) {
-            alineamientoS = S[i - 1] + alineamientoS;
-            alineamientoT = "-" + alineamientoT;
+            alineamientoS = "-" + alineamientoS;
+            alineamientoT = T[i - 1] + alineamientoT;
             i--;
             continue;
         }
 
         //Vino desde la izquierda
         else if(i > 0 && j > 0 && f[i][j] == f[i][j - 1] + V) {
-            alineamientoS = "-" + alineamientoS;
-            alineamientoT = T[j - 1] + alineamientoT;
+            alineamientoS = S[j - 1] + alineamientoS;
+            alineamientoT = "-" + alineamientoT;
             j--;
             continue;
         }
 
         //Casos extremos
         if(i > 0) {
-            alineamientoS = S[i - 1] + alineamientoS;
-            alineamientoT = "-" + alineamientoT;
+            alineamientoS = "-" + alineamientoS;
+            alineamientoT = T[i - 1] + alineamientoT;
             i--;
         } else {
-            alineamientoS = "-" + alineamientoS;
-            alineamientoT = T[j - 1] + alineamientoT;
-            j--;
-        }
-
-        /*
-        //Solo puede moverse hacia arriba
-        if(i > 0 && j == 0) {
-            alineamientoS = S[i - 1] + alineamientoS;
+            alineamientoS = S[j - 1] + alineamientoS;
             alineamientoT = "-" + alineamientoT;
-            i--;  
-        }
-
-        //Solo puede moverse hacia la izquierda
-        else if(i == 0 && j > 0) {
-            alineamientoS = "-" + alineamientoS;
-            alineamientoT = T[j - 1] + alineamientoT;
             j--;
         }
-
-        //Vino desde arriba
-        else if(i > 0 && j > 0 && f[i][j] == f[i - 1][j] + V) {
-            alineamientoS = S[i - 1] + alineamientoS;
-            alineamientoT = "-" + alineamientoT;
-            i--;
-        }
-
-        //Vino desde la izquierda
-        else if(i > 0 && j > 0 && f[i][j] == f[i][j - 1] + V) {
-            alineamientoS = "-" + alineamientoS;
-            alineamientoT = T[j - 1] + alineamientoT;
-            j--;
-        }
-
-        //Vino desde la diagonal (caso de match o mismatch)
-        else {
-            alineamientoS = S[i - 1] + alineamientoS;
-            alineamientoT = T[j - 1] + alineamientoT;
-            i--;
-            j--;
-        }
-        */
     }
 
     //String que guarda los pipes
@@ -272,19 +234,38 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
         return;
     }
 
-    int n = S.size();
-    int m = T.size();
+    int n = S.size(); // Columnas
+    int m = T.size(); // Filas
 
     archivo << "digraph G {\n";
     archivo << "graph [splines=false];\n";  
     archivo << "node [shape=box width=0.6 height=0.6 fixedsize=true style=filled];\n";
     archivo << "edge [arrowsize=0.7];\n";
 
-    // ---------- 1) Crear los nodos EN POSICIÓN ----------
-    for(int i = 0; i <= n; i++) {
+    // ---------- 1) Crear los nodos ----------
+    for(int i = 0; i <= m; i++) {
         archivo << "{ rank=same; ";  // Fuerza cada fila horizontal
 
-        for(int j = 0; j <= m; j++) {
+        for(int j = 0; j <= n; j++) {
+
+            if((i == 0 && j == 0)) {
+                archivo << "N" << i << "_" << j 
+                        << " [label=\" \"] ";
+                continue;
+            }
+
+            if(j == 0) {
+                archivo << "T" << i << "_" << j
+                        << " [label=\"" << T[i - 1] << "\"] ";
+                continue;
+            }
+
+            if(i == 0) {
+                archivo << "S" << i << "_" << j
+                        << " [label=\"" << S[j - 1] << "\"] ";
+                continue;
+            }
+
             archivo << "N" << i << "_" << j 
                     << " [label=\"" << f[i][j] << "\"] ";
         }
@@ -293,41 +274,103 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
     }
 
     // ---------- 2) Conectar nodos invisiblemente para mantener la grilla ----------
-    for(int i = 0; i <= n; i++) {
-        for(int j = 0; j < m; j++) {
-            archivo << "N" << i << "_" << j << " -> " << "N" << i << "_" << (j+1)
-                    << " [style=invis];\n";
+    // De izquierda a derecha
+    for(int i = 0; i <= m; i++) {
+        for(int j = 0; j < n; j++) {
+
+            // En posicion (0,0) conecta a la derecha con la base S(0,1)
+            if(i == 0 && j == 0) {
+                archivo << "N" << i << "_" << j << " -> " << "S" << i << "_" << (j+1)
+                        << " [style=invis];\n";
+                continue;
+            }
+            
+            // Con i > 0 y j == 0
+            // En posicion (i,0) conecta a la derecha con un nodo (i,j+1)
+            if(j == 0) {
+                archivo << "T" << i << "_" << j << " -> " << "N" << i << "_" << (j+1)
+                        << " [style=invis];\n";
+                continue;
+            }
+            
+            // Con i = 0 y j > 0
+            // En posicion (0,j) conecta a la derecha con la base S(0,j+1)
+            if(i == 0) {
+                archivo << "S" << i << "_" << j << " -> " << "S" << i << "_" << (j+1)
+                        << " [style=invis];\n";
+                continue;
+            }
+            
+            // Con i > 0 y j > 0
+            // En posicion (i,j) conecta a la derecha con un nodo (i,j+1)
+            if(i > 0 && j > 0) {
+                archivo << "N" << i << "_" << j << " -> " << "N" << i << "_" << (j+1)
+                        << " [style=invis];\n";
+                continue;
+            }
         }
     }
-    for(int j = 0; j <= m; j++) {
-        for(int i = 0; i < n; i++) {
-            archivo << "N" << i << "_" << j << " -> " << "N" << (i+1) << "_" << j
-                    << " [style=invis];\n";
+
+    // De arriba a abajo
+    for(int j = 0; j <= n; j++) {
+        for(int i = 0; i < m; i++) {
+
+            // Conecta el "0" hacia abajo con una base de T
+            if(i == 0 && j == 0) {
+                archivo << "N" << i << "_" << j << " -> " << "T" << (i+1) << "_" << j
+                        << " [style=invis];\n";
+                continue;
+            }
+
+            // Conecta base S hacia abajo con un nodo
+            if(i == 0) {
+                archivo << "S" << i << "_" << j << " -> " << "N" << (i+1) << "_" << j
+                        << " [style=invis];\n";
+                continue;
+            }
+
+            // Conecta base de T hacia abajo con otra base de T
+            if(j == 0) {
+                archivo << "T" << i << "_" << j << " -> " << "T" << (i+1) << "_" << j
+                        << " [style=invis];\n";
+                continue;
+            }
+
+            // Conecta abajo con un nodo
+            if(i > 0 && j > 0) {
+                archivo << "N" << i << "_" << j << " -> " << "N" << (i+1) << "_" << j
+                        << " [style=invis];\n";
+                continue;
+            }
         }
     }
 
     // ---------- 3) Flechas REALES del máximo ----------
-    for(int i = 0; i <= n; i++) {
-        for(int j = 0; j <= m; j++) {
+    for(int i = 0; i <= m; i++) {
+        for(int j = 0; j <= n; j++) {
 
             if(i == 0 && j == 0) continue;
+            if(i == 0) continue;
+            if(j == 0) continue;
 
             int best = f[i][j];
             bool drawn = false;
 
-            // Diagonal
-            if(!drawn && i > 0 && j > 0) {
-                int diag = f[i-1][j-1] + valor_de_similitud(S[i-1], T[j-1], U);
-                if(diag == best) {
-                    archivo << "N" << i << "_" << j
-                            << " -> N" << (i-1) << "_" << (j-1)
-                            << " [color=red penwidth=2];\n";
-                    drawn = true;
+            // Diagonal -> prioridad
+            if(!drawn) {
+                if(i - 1 >= 1 && j - 1 >= 1) {
+                    int diag = f[i-1][j-1] + valor_de_similitud(T[i-1], S[j-1], U);
+                    if(diag == best) {
+                        archivo << "N" << i << "_" << j
+                                << " -> N" << (i-1) << "_" << (j-1)
+                                << " [color=red penwidth=2];\n";
+                        drawn = true;
+                    }
                 }
             }
 
             // Arriba
-            if(!drawn && i > 0 && f[i-1][j] + V == best) {
+            if(!drawn && f[i-1][j] + V == best) {
                 archivo << "N" << i << "_" << j << " -> "
                         << "N" << (i-1) << "_" << j
                         << " [color=blue penwidth=2];\n";
@@ -335,7 +378,7 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
             }
 
             // Izquierda
-            if(!drawn && j > 0 && f[i][j-1] + V == best) {
+            if(!drawn && f[i][j-1] + V == best) {
                 archivo << "N" << i << "_" << j << " -> "
                         << "N" << i << "_" << (j-1)
                         << " [color=blue penwidth=2];\n";
@@ -349,7 +392,6 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
 
     cout << "Archivo cuadricula.dot creado correctamente.\n";
 }
-
 
 int main(int argc, char *argv[]) {
     //Valida cantidad de argumentos
@@ -398,7 +440,7 @@ int main(int argc, char *argv[]) {
 
     //Llama al algoritmo que rellena la matriz f con las puntuaciones del alineamiento
     vector<vector<int>> f = algoritmo_Needleman_Wunsch(S, T, U, V);
-
+   
     //Backtracking para obtener el alineamiento
     backtracking(S, T, f, V, U);
 
