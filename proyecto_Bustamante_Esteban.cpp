@@ -9,24 +9,27 @@ string leerFasta(string path) {
     string linea;
     string seq = "";
 
+    // Abre la ruta en solo lectura
     ifstream in(path);
 
-    //Verifica si se pudo abrir el archivo
+    //Verifica si se pudo abrir el archivo de la ruta
     if(!in) {return seq;}
     
-    //Lee el archivo
     while(getline(in, linea)) {
-        //Limpiar linea
+
+        // Limpiar linea en cada ciclo del while
         string seqTemp = "";
 
-        //Salta la primera linea
+        //Salta solamente la primera linea (encabezado del FASTA)
         if(linea[0] == '>') {continue;}
 
-        //Elimina saltos de linea
+        // Cada caracter de la linea -> se eliminan saltos de linea y luego es agregado seqTemp
         for(char c : linea) {
             if(c == '\r' || c == '\n' || c == '\t' || c == ' ') {continue;}
             else {seqTemp += c;}
         }
+
+        // Se guarda seqTemp filtrado en seq
         seq += seqTemp;
     }
     return seq;
@@ -49,24 +52,27 @@ bool leer_funU(string path, int U[4][4]) {
 
     string linea;
 
-    //Lee la primera linea
+    // Recibe la primera linea
     getline(in, linea);
 
-    //Lee el resto
+    // Lee el resto
     for(int i = 0; i < 4; i++) {
+
+        // Variables para cada linea
         char fila;
         int col1, col2, col3, col4;
 
-        //Toma una fila -> A 1 -1 -1 -1
+        // Ejemplo -> A 1 -1 -1 -1
         in >> fila >> col1 >> col2 >> col3 >> col4;
 
-        //Asigna fila
+        // Retorna número de la fila
+        // Ejemplo: A -> 0
         int valor_fila = asignaNucleotido(fila);
 
-        //Verifica si se pudo asignar
+        // Verifica si se pudo asignar
         if(valor_fila == -1) {return false;}
 
-        //Asigna columnas
+        // Asigna las columnas
         U[valor_fila][0] = col1;
         U[valor_fila][1] = col2;
         U[valor_fila][2] = col3;
@@ -84,28 +90,54 @@ int valor_de_similitud(char fila, char col, int U[4][4]) {
     return val;
 }
 
-vector<vector<int>> algoritmo_Needleman_Wunsch(string S, string T, int U[4][4], int V) {
-    int n = S.size();
-    int m = T.size();
+void muestraMatrizSimilitud(int U[4][4]) {
+    char bases[4] = {'A', 'C', 'G', 'T'};
 
-    //Creo la matriz f que tendrá las puntuaciones
+    // Imprime el encabezado
+    cout << "  ";
+    for(int i = 0; i < 4; i++) {
+        cout << bases[i] << " ";
+    }
+    cout << endl;
+
+    // Imprime las filas
+    for(int i = 0; i < 4; i++) {
+
+        // Primero la base (letra)
+        cout << bases[i] << " ";
+
+        // Luego las columnas (valores)
+        // Ej: A 1 -1 -1 -1
+        for(int j = 0; j < 4; j++) {
+            cout << U[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+vector<vector<int>> algoritmo_Needleman_Wunsch(string S, string T, int U[4][4], int V) {
+
+    int n = S.size(); // Columnas
+    int m = T.size(); // Filas
+
+    // Crea la matriz f que tendrá las puntuaciones
     vector<vector<int>> f(m + 1, vector<int>(n + 1, 0));
 
-    //Lee cada casilla de la matriz f y asigna la puntuacion
+    // Recorre cada casilla de la matriz f y asigna la puntuacion
     for(int i = 0; i <= m; i++) {
         for(int j = 0; j <= n; j++) {
 
-            //f[0][0] = 0
+            // f[0][0] = 0
             if(i == 0 && j == 0) {
                 f[i][j] = 0;
             }
 
-            //Rellena la primera fila con el escalado de V
+            // Rellena la primera columna con el escalado de V
             else if(i > 0 && j == 0) {
                 f[i][j] = f[i - 1][j] + V;
             }
 
-            //Rellena la primera columna con el escalado de V
+            // Rellena la primera fila con el escalado de V
             else if(i == 0 && j > 0) {
                 f[i][j] = f[i][j - 1] + V;
             }
@@ -115,12 +147,12 @@ vector<vector<int>> algoritmo_Needleman_Wunsch(string S, string T, int U[4][4], 
                 int left = f[i][j - 1] + V;
                 int diag = f[i - 1][j - 1] + valor_de_similitud(T[i - 1], S[j - 1], U);
 
-                //Escoge el valor más alto
+                // Escoge el valor más alto
                 int max = top;
                 if(left > max) {max = left;}
                 if(diag > max) {max = diag;}
 
-                //Asigna el valor en la matriz
+                // Asigna el valor en la matriz
                 f[i][j] = max;
             }
         }
@@ -135,12 +167,12 @@ void muestraAlineamiento(string S, string T, string pipes) {
     string lineaPipes = "";
 
     for(int i = 0; i < (int)S.size(); i++) {
-        //Agrega a cada string
+        // Agrega a cada string
         lineaS += S[i];
         lineaT += T[i];
         lineaPipes += pipes[i];
         
-        //Al llegar a un limite imprime el bloque
+        // Imprime bloques de 80 caracteres
         if((i + 1) % 80 == 0) {
             cout << lineaS << endl;
             cout << lineaPipes << endl;
@@ -153,7 +185,7 @@ void muestraAlineamiento(string S, string T, string pipes) {
         }
     }
 
-    //Imprime el ultimo bloque
+    //Imprime el ultimo bloque (< 80)
     if(!lineaS.empty()) {
         cout << lineaS << endl;
         cout << lineaPipes << endl;
@@ -163,8 +195,8 @@ void muestraAlineamiento(string S, string T, string pipes) {
 }
 
 void backtracking(string S, string T, vector<vector<int>> f, int V, int U[4][4]) {
-    int i = T.size();
-    int j = S.size();
+    int i = T.size(); // Fila
+    int j = S.size(); // Columna
 
     string alineamientoS = "";
     string alineamientoT = "";
@@ -208,7 +240,7 @@ void backtracking(string S, string T, vector<vector<int>> f, int V, int U[4][4])
         }
     }
 
-    //String que guarda los pipes
+    // String que guarda los pipes
     string pipes = "";
     for(int i = 0; i < (int)alineamientoS.size(); i++) {
         if(alineamientoS[i] == alineamientoT[i] && alineamientoS[i] != '-') {
@@ -221,8 +253,8 @@ void backtracking(string S, string T, vector<vector<int>> f, int V, int U[4][4])
     cout << "--------------------------------------\n";
     cout << "Resultado del alineamiento:\n";
     cout << "--------------------------------------\n";
-    
-    //Imprimir alineamiento por bloques
+
+    // Imprimir alineamiento por bloques
     muestraAlineamiento(alineamientoS, alineamientoT, pipes);
 }
 
@@ -238,34 +270,36 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
     int m = T.size(); // Filas
 
     archivo << "digraph G {\n";
-    archivo << "graph [splines=false];\n";  
-    archivo << "node [shape=box width=0.6 height=0.6 fixedsize=true style=filled];\n";
-    archivo << "edge [arrowsize=0.7];\n";
+    archivo << "node [shape=box style=filled];\n";
 
-    // ---------- 1) Crear los nodos ----------
+    // Crea nodos
     for(int i = 0; i <= m; i++) {
         archivo << "{ rank=same; ";  // Fuerza cada fila horizontal
 
         for(int j = 0; j <= n; j++) {
 
+            // Crea el nodo en f[0][0]
             if((i == 0 && j == 0)) {
                 archivo << "N" << i << "_" << j 
                         << " [label=\" \"] ";
                 continue;
             }
 
+            // Crea los nodos de la primera columna -> string T
             if(j == 0) {
                 archivo << "T" << i << "_" << j
                         << " [label=\"" << T[i - 1] << "\"] ";
                 continue;
             }
 
+            // Crea los nodos de la primera fila -> string S
             if(i == 0) {
                 archivo << "S" << i << "_" << j
                         << " [label=\"" << S[j - 1] << "\"] ";
                 continue;
             }
 
+            // Crea los nodos de las puntuaciones
             archivo << "N" << i << "_" << j 
                     << " [label=\"" << f[i][j] << "\"] ";
         }
@@ -273,7 +307,8 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
         archivo << "}\n";
     }
 
-    // ---------- 2) Conectar nodos invisiblemente para mantener la grilla ----------
+    // Conecta cada nodo con el siguiente (para una grilla rectangular)
+
     // De izquierda a derecha
     for(int i = 0; i <= m; i++) {
         for(int j = 0; j < n; j++) {
@@ -286,7 +321,7 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
             }
             
             // Con i > 0 y j == 0
-            // En posicion (i,0) conecta a la derecha con un nodo (i,j+1)
+            // En posicion (i,0) conecta a la derecha con un nodo N(i,j+1)
             if(j == 0) {
                 archivo << "T" << i << "_" << j << " -> " << "N" << i << "_" << (j+1)
                         << " [style=invis];\n";
@@ -302,7 +337,7 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
             }
             
             // Con i > 0 y j > 0
-            // En posicion (i,j) conecta a la derecha con un nodo (i,j+1)
+            // En posicion (i,j) conecta a la derecha con un nodo N(i,j+1)
             if(i > 0 && j > 0) {
                 archivo << "N" << i << "_" << j << " -> " << "N" << i << "_" << (j+1)
                         << " [style=invis];\n";
@@ -315,7 +350,7 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
     for(int j = 0; j <= n; j++) {
         for(int i = 0; i < m; i++) {
 
-            // Conecta el "0" hacia abajo con una base de T
+            // Conecta el " " hacia abajo con una base de T
             if(i == 0 && j == 0) {
                 archivo << "N" << i << "_" << j << " -> " << "T" << (i+1) << "_" << j
                         << " [style=invis];\n";
@@ -336,7 +371,7 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
                 continue;
             }
 
-            // Conecta abajo con un nodo
+            // Conecta nodo hacia abajo con otro nodo
             if(i > 0 && j > 0) {
                 archivo << "N" << i << "_" << j << " -> " << "N" << (i+1) << "_" << j
                         << " [style=invis];\n";
@@ -345,44 +380,45 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
         }
     }
 
-    // ---------- 3) Flechas REALES del máximo ----------
+    // Flechas del mejor recorrido
     for(int i = 0; i <= m; i++) {
         for(int j = 0; j <= n; j++) {
 
+            // Ignora el " " (i == 0 && j == 0), el string S (i == 0) y el string T (j == 0)
             if(i == 0 && j == 0) continue;
             if(i == 0) continue;
             if(j == 0) continue;
 
-            int best = f[i][j];
-            bool drawn = false;
+            int mejorPuntuacion = f[i][j];
+            bool seleccion = false;
 
             // Diagonal -> prioridad
-            if(!drawn) {
+            if(!seleccion) {
                 if(i - 1 >= 1 && j - 1 >= 1) {
                     int diag = f[i-1][j-1] + valor_de_similitud(T[i-1], S[j-1], U);
-                    if(diag == best) {
+                    if(diag == mejorPuntuacion) {
                         archivo << "N" << i << "_" << j
                                 << " -> N" << (i-1) << "_" << (j-1)
                                 << " [color=red penwidth=2];\n";
-                        drawn = true;
+                        seleccion = true;
                     }
                 }
             }
 
-            // Arriba
-            if(!drawn && f[i-1][j] + V == best) {
+            // Arriba -> segunda prioridad
+            if(!seleccion && f[i-1][j] + V == mejorPuntuacion) {
                 archivo << "N" << i << "_" << j << " -> "
                         << "N" << (i-1) << "_" << j
                         << " [color=blue penwidth=2];\n";
-                drawn = true;
+                seleccion = true;
             }
 
-            // Izquierda
-            if(!drawn && f[i][j-1] + V == best) {
+            // Izquierda -> tercera prioridad
+            if(!seleccion && f[i][j-1] + V == mejorPuntuacion) {
                 archivo << "N" << i << "_" << j << " -> "
                         << "N" << i << "_" << (j-1)
                         << " [color=blue penwidth=2];\n";
-                drawn = true;
+                seleccion = true;
             }
         }
     }
@@ -394,9 +430,10 @@ void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4
 }
 
 int main(int argc, char *argv[]) {
-    //Valida cantidad de argumentos
+
+    // Deben ser 9 parámetros
     if(argc != 9) {
-        cout << "Cantidad de argumentos incorrecta" << endl;
+        cout << "Cantidad de parámetros incorrecta" << endl;
         return 0;
     }
 
@@ -405,7 +442,7 @@ int main(int argc, char *argv[]) {
     string cad1, cad2, funU;
     string S, T;
 
-    //Asigna los argumentos
+    // Asigna argumento según parámetro
     for (int i = 1; i < argc; i++) {
         string arg = argv[i];
         if(arg == "-C1") {cad1 = argv[++i];}
@@ -413,38 +450,52 @@ int main(int argc, char *argv[]) {
         else if(arg == "-U") {funU = argv[++i];}
         else if(arg == "-V") {V = atoi(argv[++i]);}
         else {
-            cout << "Argumento invalido" << endl;
+            cout << "Error: parámetro mal referenciado" << endl;
             return 0;
         }
     }
 
-    //Valida cantidad de argumentos
+    // No acepta parámetros vacíos
     if(cad1 == "" || cad2 == "" || funU == "" || V == 0) {
-        cout << "Argumentos incorrectos" << endl;
+        cout << "Se ha entregado un parámetro vacío" << endl;
         return 0;
     }
 
-    //Lee los archivos
+    // Lee los archivos y crea las secuencias en "string"
     S = leerFasta(cad1);
     T = leerFasta(cad2);
-    //Verifica si se pudieron leer
+    // Verifica que se hayan ingresado las secuencias a los string
     if(S.empty() || T.empty()) {
         cout << "No se pudo leer las secuencias" << endl;
         return 0;
     }
 
-    //Lee la función de similitud
+    // Lee y crea la función de similitud U
     if(!leer_funU(funU, U)) {
         cout << "No se pudo leer la función de similitud" << endl;
     }
 
-    //Llama al algoritmo que rellena la matriz f con las puntuaciones del alineamiento
+    // Llama al algoritmo que rellena la matriz f con las puntuaciones del alineamiento
     vector<vector<int>> f = algoritmo_Needleman_Wunsch(S, T, U, V);
    
-    //Backtracking para obtener el alineamiento
+    cout << "--------------------------------------\n";
+    cout << "     Algoritmo de Needleman Wunsch    \n";
+    cout << "--------------------------------------\n";
+    cout << endl;
+    // Imprime las secuencias
+    cout << "Secuencia 1: " << S << endl;
+    cout << "Secuencia 2: " << T << endl;
+    cout << endl;
+    // Muestra la matriz de similitud
+    cout << "Se utilizará la función de similitud: \n";
+    muestraMatrizSimilitud(U);
+    cout << endl;
+
+
+    // Backtracking para obtener el alineamiento
     backtracking(S, T, f, V, U);
 
-    //Genera la cuadricula
+    // Genera la cuadricula
     generarCuadricula(S, T, f, V, U);
     system("dot -Tpng cuadricula.dot -o cuadricula.png");
 
