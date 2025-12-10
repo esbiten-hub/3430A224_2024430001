@@ -2,7 +2,6 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include <tuple>
 
 using namespace std;
 
@@ -248,7 +247,7 @@ pair <string, string> backtracking(string S, string T, vector<vector<int>> f, in
         }
 
         //Vino desde arriba
-        else if(i > 0 && j > 0 && f[i][j] == f[i - 1][j] + V) {
+        else if(i > 0 && f[i][j] == f[i - 1][j] + V) {
             alineamientoS = "-" + alineamientoS;
             alineamientoT = T[i - 1] + alineamientoT;
             i--;
@@ -256,7 +255,7 @@ pair <string, string> backtracking(string S, string T, vector<vector<int>> f, in
         }
 
         //Vino desde la izquierda
-        else if(i > 0 && j > 0 && f[i][j] == f[i][j - 1] + V) {
+        else if(j > 0 && f[i][j] == f[i][j - 1] + V) {
             alineamientoS = S[j - 1] + alineamientoS;
             alineamientoT = "-" + alineamientoT;
             j--;
@@ -274,6 +273,7 @@ pair <string, string> backtracking(string S, string T, vector<vector<int>> f, in
             j--;
         }
     }
+
     return make_pair(alineamientoS, alineamientoT);
 }
 
@@ -571,7 +571,6 @@ int main(int argc, char *argv[]) {
     cout << "Se utilizará la función de similitud: \n";
     muestraMatrizSimilitud(U);
     cout << endl;
-
 
     // Backtracking para obtener el alineamiento
     pair<string, string> alineamientos = backtracking(S, T, f, V, U);
