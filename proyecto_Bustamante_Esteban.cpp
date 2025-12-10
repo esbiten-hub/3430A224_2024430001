@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <tuple>
 
 using namespace std;
 
@@ -115,7 +116,7 @@ void muestraMatrizSimilitud(int U[4][4]) {
     }
 }
 
-vector<vector<int>> algoritmo_Needleman_Wunsch(string S, string T, int U[4][4], int V) {
+vector<vector<int>> algoritmo_NeedlemanWunsch(string S, string T, int U[4][4], int V) {
 
     int n = S.size(); // Columnas
     int m = T.size(); // Filas
@@ -161,7 +162,7 @@ vector<vector<int>> algoritmo_Needleman_Wunsch(string S, string T, int U[4][4], 
     return f;
 }
 
-void muestraAlineamiento(string S, string T, string pipes) {
+void muestraAlineamiento(string S, string T) {
     string lineaS = "";
     string lineaT = "";
     string lineaPipes = "";
@@ -170,7 +171,8 @@ void muestraAlineamiento(string S, string T, string pipes) {
         // Agrega a cada string
         lineaS += S[i];
         lineaT += T[i];
-        lineaPipes += pipes[i];
+        if(S[i] == T[i]) {lineaPipes += '|';}
+        else {lineaPipes += " ";}
         
         // Imprime bloques de 80 caracteres
         if((i + 1) % 80 == 0) {
@@ -194,7 +196,40 @@ void muestraAlineamiento(string S, string T, string pipes) {
     }
 }
 
-void backtracking(string S, string T, vector<vector<int>> f, int V, int U[4][4]) {
+void muestraSimilitud(string S, string T) {
+    int matches = 0;
+    int bases_sin_gaps = 0;
+    float cobertura = 0;
+    float similitud_sinGaps = 0;
+    float similitud_conGaps = 0;
+
+    // Cuenta matches
+    for(int i = 0; i < (int)S.size(); i++) {
+
+        // No cuenta gaps
+        if(S[i] != '-' && T[i] != '-') {
+            bases_sin_gaps++;
+            if(S[i] == T[i]) {matches++;}
+        }
+    }
+
+    similitud_sinGaps = (float)matches / (float)bases_sin_gaps * 100;
+    similitud_conGaps = (float)matches / (float)S.size() * 100;
+    cobertura = (float)bases_sin_gaps / (float)S.size() * 100;
+
+    // Identidad de matches respecto los mismatch
+    cout << "% Identidad (excluyendo gaps) " << similitud_sinGaps << "%" << endl;
+
+    // Identidad de macthes respecto a la longitud de la secuencia
+    cout << "% Identidad (incluyendo gaps) " << similitud_conGaps << "%" << endl;
+
+    // % de la secuencias que se alineó
+    cout << "Se alineó exitosamente:\n";
+    cout << "Cobertura: " << cobertura << "%" << endl;
+    cout << endl;
+}
+
+pair <string, string> backtracking(string S, string T, vector<vector<int>> f, int V, int U[4][4]) {
     int i = T.size(); // Fila
     int j = S.size(); // Columna
 
@@ -239,26 +274,72 @@ void backtracking(string S, string T, vector<vector<int>> f, int V, int U[4][4])
             j--;
         }
     }
+    return make_pair(alineamientoS, alineamientoT);
+}
 
-    // String que guarda los pipes
-    string pipes = "";
-    for(int i = 0; i < (int)alineamientoS.size(); i++) {
-        if(alineamientoS[i] == alineamientoT[i] && alineamientoS[i] != '-') {
-            pipes += "|";
-        } else {
-            pipes += " ";
+void alineamientoGraphviz(const string& S, const string& T) {
+    ofstream archivo("alineamiento.dot");
+
+    if(!archivo.is_open()) {
+        cout << "No se pudo abrir el archivo\n";
+        return;
+    }
+
+    archivo << "digraph G {\n";
+    archivo << "node [shape=box style=filled];\n";
+    archivo << "rankdir=TB;\n";
+    archivo << "ranksep=0.1\n";
+    archivo << "nodesep=0\n";
+
+    // Crear nodos de S
+    for(int i = 0; i < (int)S.size(); i++) {
+        string color;
+
+        // Asignar color
+        if(S[i]=='-') {color = "grey";}
+        else if (S[i] == T[i]) {color = "lightgreen";}
+        else {
+            if(T[i] == '-') {color = "grey";}
+            else {color = "red";}
+        }
+
+        archivo << "S" << i << " [label=\"" << S[i] << "\", fillcolor=\"" << color << "\"];\n";
+    }
+
+    // Crear nodos de T
+    for(int i = 0; i < (int)T.size(); i++) {
+        string color;
+
+        if (T[i] == '-') {color = "grey";}
+        else if (T[i] == S[i]) {color = "lightgreen";}
+        else {
+            if(S[i] == '-') {color = "grey";}
+            else {color = "red";}
+        }
+
+        archivo << "T" << i << " [label=\"" << T[i] << "\", fillcolor=\"" << color << "\"];\n";
+    }
+
+    // Crear aristas
+    for(int i = 0; i < (int)S.size(); i++) {
+
+        // Es un match
+        if(S[i] == T[i]) {
+            archivo << "S" << i << " -> T" << i << " [arrowhead=none];\n";
+            continue;
+        }
+
+        // Es mismatch o gap
+        else {
+            archivo << "S" << i << " -> T" << i << " [style=invis];\n";
         }
     }
 
-    cout << "--------------------------------------\n";
-    cout << "Resultado del alineamiento:\n";
-    cout << "--------------------------------------\n";
-
-    // Imprimir alineamiento por bloques
-    muestraAlineamiento(alineamientoS, alineamientoT, pipes);
+    archivo << "}\n";
+    cout << "Archivo alineamiento.dot creado correctamente.\n";
 }
 
-void generarCuadricula(string S, string T, vector<vector<int>> f, int V, int U[4][4]) {
+void cuadriculaGraphviz(string S, string T, vector<vector<int>> f, int V, int U[4][4]) {
     ofstream archivo("cuadricula.dot");
 
     if(!archivo.is_open()) {
@@ -440,7 +521,7 @@ int main(int argc, char *argv[]) {
     int V = 0;
     int U[4][4];
     string cad1, cad2, funU;
-    string S, T;
+    string S, T, alineamientoS, alineamientoT;
 
     // Asigna argumento según parámetro
     for (int i = 1; i < argc; i++) {
@@ -476,7 +557,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Llama al algoritmo que rellena la matriz f con las puntuaciones del alineamiento
-    vector<vector<int>> f = algoritmo_Needleman_Wunsch(S, T, U, V);
+    vector<vector<int>> f = algoritmo_NeedlemanWunsch(S, T, U, V);
    
     cout << "--------------------------------------\n";
     cout << "     Algoritmo de Needleman Wunsch    \n";
@@ -493,10 +574,28 @@ int main(int argc, char *argv[]) {
 
 
     // Backtracking para obtener el alineamiento
-    backtracking(S, T, f, V, U);
+    pair<string, string> alineamientos = backtracking(S, T, f, V, U);
+    alineamientoS = alineamientos.first;
+    alineamientoT = alineamientos.second;
 
-    // Genera la cuadricula
-    generarCuadricula(S, T, f, V, U);
+    // Imprimir alineamiento por bloques
+    cout << "--------------------------------------\n";
+    cout << "Resultado del alineamiento:\n";
+    cout << "--------------------------------------\n";
+    muestraAlineamiento(alineamientoS, alineamientoT);
+
+    // Porcentajes de similitud
+    cout << "--------------------------------------\n";
+    cout << "Porcentajes de similitud:\n";
+    cout << "--------------------------------------\n";
+    muestraSimilitud(alineamientoS, alineamientoT);
+
+    // Genera alineamiento en Graphviz
+    alineamientoGraphviz(alineamientoS, alineamientoT);
+    system("dot -Tpng alineamiento.dot -o alineamiento.png");
+
+    // Genera la cuadricula en Graphviz
+    cuadriculaGraphviz(S, T, f, V, U);
     system("dot -Tpng cuadricula.dot -o cuadricula.png");
 
     return 0;
