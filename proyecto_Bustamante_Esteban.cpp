@@ -109,7 +109,8 @@ void muestraMatrizSimilitud(int U[4][4]) {
         // Luego las columnas (valores)
         // Ej: A 1 -1 -1 -1
         for(int j = 0; j < 4; j++) {
-            cout << U[i][j] << " ";
+            if(U[i][j] > 0) {cout << " " << U[i][j] << " ";}
+            else {cout << U[i][j] << " ";}
         }
         cout << endl;
     }
